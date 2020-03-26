@@ -1,0 +1,20 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: avengers-api
+spec: 
+  selector:
+    matchLabels:
+      app: avengers-api
+  replicas: 3 # tells deployment to run 1 pod matching the template
+  template:
+    metadata:
+      labels:
+        app: avengers-api
+    spec:
+      containers:
+      - name: avengers-api
+        image: gcr.io/roidtc-0323-attendee109/avengers-gcr-internal:v0.1
+        ports:
+        - containerPort: 8082
+   
