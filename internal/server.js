@@ -1,4 +1,9 @@
 'use strict';
+// [START firestore_quickstart]
+ 	const {Firestore} = require('@google-cloud/firestore');
+ 	 
+ 	// Create a new client
+ 	const firestore = new Firestore();
 
 // express is a nodejs web server
 // https://www.npmjs.com/package/express
@@ -10,6 +15,10 @@ const bodyParser = require('body-parser');
 
 // create the server
 const app = express();
+
+//async function quickstart() {
+ 	// Obtain a document reference.
+ 	const document = firestore.doc('posts/intro-to-firestore');
 
 // the backend server will parse json, not a form request
 app.use(bodyParser.json());
@@ -39,8 +48,17 @@ app.get('/version', (req, res) => {
 
 // mock events endpoint. this would be replaced by a call to a datastore
 // if you went on to develop this as a real application.
+let postsRef = firestore.collection('posts');
+let allPosts = postsRef.get()
+  .then(snapshot => {
+    snapshot.forEach(doc => {
+      console.log(doc.description, '=>', doc.title);
+    });
+  })
 app.get('/events', (req, res) => {
-    res.json(mockEvents);
+   res.json(allPosts);
+     //document.get(res.json(mockEvents));
+   // res.json(mockEvents);
 });
 
 // Adds an event - in a real solution, this would insert into a cloud datastore.
@@ -51,20 +69,24 @@ app.post('/event', (req, res) => {
     const ev = { 
         title: req.body.title, 
         description: req.body.description,
-        id : mockEvents.events.length + 1
+        //id : mockEvents.events.length + 1
      }
-    // add to the mock array
-    mockEvents.events.push(ev);
+      //document.set(ev).then(() => {
+         let addDoc = firestore.collection('posts').add(ev).then(() => {
+     mockEvents.events.push(ev);
     // return the complete array
     res.json(mockEvents);
-});
+     } );
+    // add to the mock array
+   
+    });
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: err.message });
 });
 
-const PORT = 8082;
+const PORT = 8084;
 const server = app.listen(PORT, () => {
     const host = server.address().address;
     const port = server.address().port;
